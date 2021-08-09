@@ -265,6 +265,7 @@ def main(stdscr,path,lvl):
 
 def random_map(min,max):
     x = randint(min,max)
+    write_id("map.nbr",x)
     if x == 1:
         return("map/level1")
     if x == 2:
@@ -296,6 +297,7 @@ def print_rule():
 def menu():
     lvl = 1
     x = random_map(1,10)
+    map_nbr = print_file("map.nbr")
     path = print_file("map/level1")
     system("clear")          
     print("----SOKOBAN----")  
@@ -316,7 +318,7 @@ def menu():
         wrapper(main,x,lvl)
     if choix == "2":       
         system("clear")
-        wrapper(main,x,lvl)
+        wrapper(main,x,int(map_nbr))
     if choix == "3":
         system("clear")
         level_choose(lvl)
@@ -325,7 +327,7 @@ def menu():
         print_rule()
     if choix == "5":
         system("clear")
-        wrapper(main,"my_map",100)
+        wrapper(main,"my_map",0)
     if choix == "6":
         system("clear")
         quit()
@@ -348,8 +350,9 @@ def level_choose(lvl):
     print("      ")        
     choix = input("Choose your level: ")
     x = random_map(int(choix),int(choix))
+    map_nbr = print_file("map.nbr")
     system("clear")
-    wrapper(main,x,lvl)
+    wrapper(main,x,int(map_nbr))
     
 system("clear")
 my_map = "your_map"
