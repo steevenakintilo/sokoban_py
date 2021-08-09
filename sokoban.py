@@ -118,7 +118,8 @@ def you_win(stdscr,tries,path,lvl):
     stdscr.addstr(10,90,"You Win! in " + str(tries) + " tries",curses.color_pair(1))
     stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
     stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
-    stdscr.addstr(16,90,"Press C to continue to the next level!",curses.color_pair(1))
+    if lvl != 100:
+        stdscr.addstr(16,90,"Press C to continue to the next level!",curses.color_pair(1))
     system("clear")
     x = random_map(lvl,lvl)
     c = stdscr.getch()
@@ -163,6 +164,8 @@ def main(stdscr,path,lvl):
                     stdscr.addstr(w[i])     
             get_pos(w,path)
         if win == 0:
+            stdscr.addstr(1,30,"Level: " + str(lvl),curses.color_pair(4))
+            stdscr.addstr(1,37,str(lvl))
             stdscr.addstr(2,30,"Number of move: " + str(tries),curses.color_pair(4))
             stdscr.addstr(2,46,str(tries))
         psx = print_file("pos")
@@ -193,6 +196,8 @@ def main(stdscr,path,lvl):
             win = 1
             lvl = lvl + 1
             you_win(stdscr,tries,path,lvl)
+        if c == ord(' '):
+            wrapper(main(stdscr,path,lvl))
         if c == curses.KEY_UP:
             tries = tries + 1
             if w[pos] == "X" and w[pos - lenght] == " " :
@@ -281,7 +286,7 @@ def random_map(min,max):
     if x == 10:
         return("map/level10")
 def print_rule():                                                                                                                                                                      
-    choice = input("The rules of the game:\n\nYou are a player X and your gaol is to put all the box W into their hole O to win but be careful because you can loose if a box is blocked.\n\nThey are several game mode a mod to play all the level,one to play random level, one to choose your level and one to made one.\\n\nHave fun.\n\nWrite 1 to go back to the menu and 0 to quit\n\n\n: ")                                                                                 
+    choice = input("The rules of the game:\n\nYou are a player X and your gaol is to put all the box W into their hole O to win but be careful because you can loose if a box is blocked.\n\nThey are several game mode a mod to play all the level,one to play random level and you can even play your own map by editing the my_map file and pressing 5 in the menu.\\n\nHave fun.\n\nWrite 1 to go back to the menu and 0 to quit\n\n\n: ")                                                                                 
     if choice == "1":                                                                                                                                                                  
         menu()                                                                                                                                                                         
     else:                                                                                                                                                                              
@@ -300,7 +305,7 @@ def menu():
     print("2.Random level")
     print("3.Choose your level")     
     print("4.Rules")
-    print("5.Map Maker")
+    print("5.Your Map")
     print("6.Quit")
     print("     ")         
     print("      ")        
@@ -318,9 +323,9 @@ def menu():
     if choix == "4":
         system("clear")
         print_rule()
-    if choix == "5":    
+    if choix == "5":
         system("clear")
-        print("Not Working now")
+        wrapper(main,"my_map",100)
     if choix == "6":
         system("clear")
         quit()
@@ -346,8 +351,8 @@ def level_choose(lvl):
     system("clear")
     wrapper(main,x,lvl)
     
-#path = sys.argv[1]
 system("clear")
+my_map = "your_map"
 menu()
 #print(x)
 #wrapper(main,path)
