@@ -29,8 +29,8 @@ def write_id(path,x):
     f.write(str(x))    
     f.close  
 
-def count_the_line():
-    strs = print_file("map.txt")
+def count_the_line(path):
+    strs = print_file(path)
     line = 0
     for i in range(len(strs)):
         if strs[i] == "\n":
@@ -43,41 +43,41 @@ def print_file(path):
     return(content)
     f.close()
 
-def get_pos(w):
-    for i in range(char_nbr("map.txt")):
+def get_pos(w,path):
+    for i in range(char_nbr(path)):
         if w[i] == "X":
             write_id("pos",i)
             break
 
-def get_posw(w):
+def get_posw(w,path):
     count = []
-    for i in range(char_nbr("map.txt")):
+    for i in range(char_nbr(path)):
         if w[i] == "W":
             count.append(i)
     return(count)
 
-def get_line(w):
-    for i in range(char_nbr("map.txt")):
+def get_line(w,path):
+    for i in range(char_nbr(path)):
         if w[i] == "\n":
             return (i)
             break
-def count_box(w,char):
+def count_box(w,char,path):
     count = 0
-    for i in range(char_nbr("map.txt")):
+    for i in range(char_nbr(path)):
         if w[i] == char:
             count = count + 1
     return (count)
 
-def pos_hole(w):
+def pos_hole(w,path):
     count = []
-    for i in range(char_nbr("map.txt")):
+    for i in range(char_nbr(path)):
         if w[i] == "O":
             count.append(i)
     return (count)
 
-def pos_box(w):
+def pos_box(w,path):
     count = []
-    for i in range(char_nbr("map.txt")):
+    for i in range(char_nbr(path)):
         if w[i] == "W":
             count.append(i)
     return (count)
@@ -93,11 +93,11 @@ def split(word):
 
 def print_corner(w,lenght):
     count = []
-    for i in range(char_nbr("map.txt")):
+    for i in range(char_nbr(path)):
         if w[i] == "#" and w[i + 1] == "#" and w[i + lenght] == "#" and w[i + lenght + 1] == "W":
             return (1)
 
-def you_loose(stdscr):
+def you_loose(stdscr,path,lvl):
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
     curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
     stdscr.clear()
@@ -107,79 +107,92 @@ def you_loose(stdscr):
     stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
     system("clear")
     c = stdscr.getch()
-    if c == ord('q'):
-        quit()
     if c == ord('r'):
-        wrapper(main)
-    
-def main(stdscr):
+        wrapper(main,path,lvl)
+    else:
+        quit()
+def you_win(stdscr,tries,path,lvl):
+    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_WHITE)
+    stdscr.clear()
+    stdscr.refresh()
+    stdscr.addstr(10,90,"You Win! in " + str(tries) + " tries",curses.color_pair(1))
+    stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
+    stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
+    stdscr.addstr(16,90,"Press C to continue to the next level!",curses.color_pair(1))
+    system("clear")
+    x = random_map(lvl,lvl)
+    c = stdscr.getch()
+    if c == ord('r'):
+        lvl = lvl - 1
+        x = random_map(lvl,lvl)
+        wrapper(main,x,lvl)
+    if c == ord('c'):
+        wrapper(main,x,lvl)
+    else:
+        quit()
+def main(stdscr,path,lvl):
     system("clear")
     stdscr.clear()
-    word = print_file("map.txt")
+    word = print_file(path)
     w = split(word)
     ws = split(word)
-    hole_pos = pos_hole(ws)
+    hole_pos = pos_hole(ws,path)
     write_id("hoole",hole_pos)
-    l = get_line(w)
+    l = get_line(w,path)
     lenght = int(l) + 1
     win = 0
     tries = 0
-    w_nbr = count_box(w,"W")
-    curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_WHITE)
+    w_nbr = count_box(w,"W",path)
+    curses.init_pair(1, curses.COLOR_YELLOW, curses.COLOR_BLACK)
     curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(5, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(6, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+    
     while True:
-        for i in range(char_nbr("map.txt")):
+        for i in range(char_nbr(path)):
             if win == 0:
-                stdscr.addstr(w[i])
-                #stdscr.addstr(10,90,"Number of move",curses.color_pair(2))
-            get_pos(w)
-            #get_posw(w)
+                if w[i] == "#":
+                    stdscr.addstr(w[i],curses.color_pair(1))
+                elif w[i] == "W":
+                    stdscr.addstr(w[i],curses.color_pair(6))
+                elif w[i] == "O":
+                    stdscr.addstr(w[i],curses.color_pair(3))    
+                else:
+                    stdscr.addstr(w[i])     
+            get_pos(w,path)
         if win == 0:
-            stdscr.addstr(2,30,"Number of move: " + str(tries),curses.color_pair(2))
+            stdscr.addstr(2,30,"Number of move: " + str(tries),curses.color_pair(4))
             stdscr.addstr(2,46,str(tries))
-        #posww = print_file("posw")
-        #posw = int(posww)
         psx = print_file("pos")
         pos = int(psx)
         c = stdscr.getch()
         stdscr.clear()
-        box_pos = pos_box(w)
-        posw = get_posw(w)
-        #write_id("tttt",w_pos)
+        box_pos = pos_box(w,path)
+        posw = get_posw(w,path)
         write_id("hole",box_pos)
-        #if print_corner(w,lenght) == 1:
-        #if w[0] == "#" and w[1] == "#" and w[0 + lenght] == "#" and w[lenght + 1] == "W":
-        #    quit()
         for i in range(w_nbr):
-            if w[posw[i] - lenght] == "#" and w[posw[i] - lenght + 1] == "#" and w[posw[i] - 1] == "#" and w[posw[i]] == "W":
+            if w[posw[i] - lenght] == "#" and w[posw[i] - lenght + 1] == "#" and w[posw[i] - 1] == "#" and w[posw[i]] == "W" and posw[i] not in hole_pos:
                 win = 2
-                you_loose(stdscr)
-            if w[posw[i] - lenght] == "W" and w[posw[i] - lenght + 1] == "W" and w[posw[i] - 1] == "W" and w[posw[i]] == "W":
+                you_loose(stdscr,path,lvl)
+            if w[posw[i] - lenght] == "W" and w[posw[i] - lenght + 1] == "W" and w[posw[i] - 1] == "W" and w[posw[i]] == "W" and posw[i] not in hole_pos:
                 win = 2
-                you_loose(stdscr)
-            if w[posw[i] - lenght] == "#" and w[posw[i] - lenght - 1] == "#" and w[posw[i] + 1] == "#" and w[posw[i]] == "W":
+                you_loose(stdscr,path,lvl)
+            if w[posw[i] - lenght] == "#" and w[posw[i] - lenght - 1] == "#" and w[posw[i] + 1] == "#" and w[posw[i]] == "W" and posw[i] not in hole_pos:
                 win = 2
-                you_loose(stdscr)
-            if w[posw[i] + lenght] == "#" and w[posw[i] + lenght - 1] == "#" and w[posw[i] - 1] == "#" and w[posw[i]] == "W":
+                you_loose(stdscr,path,lvl)
+            if w[posw[i] + lenght] == "#" and w[posw[i] + lenght - 1] == "#" and w[posw[i] - 1] == "#" and w[posw[i]] == "W" and posw[i] not in hole_pos:
                 win = 2
-                you_loose(stdscr)
-            if w[posw[i] + lenght] == "#" and w[posw[i] + lenght + 1] == "#" and w[posw[i] + 1] == "#" and w[posw[i]] == "W":
+                you_loose(stdscr,path,lvl)
+            if w[posw[i] + lenght] == "#" and w[posw[i] + lenght + 1] == "#" and w[posw[i] + 1] == "#" and w[posw[i]] == "W" and posw[i] not in hole_pos:
                 win = 2
-                you_loose(stdscr)
+                you_loose(stdscr,path,lvl)
                 
-        if count_box(w,"O") == 0 and pos not in hole_pos:
-            #print("ok")
+        if count_box(w,"O",path) == 0 and pos not in hole_pos:
             win = 1
-            stdscr.clear()
-            stdscr.refresh()
-            stdscr.addstr(10,90,"You Win! in " + str(tries) + " tries",curses.color_pair(1))
-            stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
-            stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
-            system("clear")
-            if c == ord('q'):
-                quit()
-            if c == ord('r'):
-                wrapper(main)
+            lvl = lvl + 1
+            you_win(stdscr,tries,path,lvl)
         if c == curses.KEY_UP:
             tries = tries + 1
             if w[pos] == "X" and w[pos - lenght] == " " :
@@ -245,7 +258,97 @@ def main(stdscr):
                 w[pos] = "O"    
     stdscr.refresh()
 
-board = sys.argv[1]
+def random_map(min,max):
+    x = randint(min,max)
+    if x == 1:
+        return("map/level1")
+    if x == 2:
+        return("map/level2")
+    if x == 3:
+        return("map/level3")
+    if x == 4:
+        return("map/level4")
+    if x == 5:
+        return("map/level5")
+    if x == 6:
+        return("map/level6")
+    if x == 7:
+        return("map/level7")
+    if x == 8:
+        return("map/level8")
+    if x == 9:
+        return("map/level9")
+    if x == 10:
+        return("map/level10")
+def print_rule():                                                                                                                                                                      
+    choice = input("The rules of the game:\n\nYou are a player X and your gaol is to put all the box W into their hole O to win but be careful because you can loose if a box is blocked.\n\nThey are several game mode a mod to play all the level,one to play random level, one to choose your level and one to made one.\\n\nHave fun.\n\nWrite 1 to go back to the menu and 0 to quit\n\n\n: ")                                                                                 
+    if choice == "1":                                                                                                                                                                  
+        menu()                                                                                                                                                                         
+    else:                                                                                                                                                                              
+        print("Bye")                                                                                                                                                                   
+        quit()                                                                                                                                                                         
+  
+def menu():
+    lvl = 1
+    x = random_map(1,10)
+    path = print_file("map/level1")
+    system("clear")          
+    print("----SOKOBAN----")  
+    print("    ")          
+    print("    ")          
+    print("1.All level")       
+    print("2.Random level")
+    print("3.Choose your level")     
+    print("4.Rules")
+    print("5.Map Maker")
+    print("6.Quit")
+    print("     ")         
+    print("      ")        
+    choix = input("CHOIX:")
+    if choix == "1":  
+        system("clear")
+        x = random_map(1,1)
+        wrapper(main,x,lvl)
+    if choix == "2":       
+        system("clear")
+        wrapper(main,x,lvl)
+    if choix == "3":
+        system("clear")
+        level_choose(lvl)
+    if choix == "4":
+        system("clear")
+        print_rule()
+    if choix == "5":    
+        system("clear")
+        print("Not Working now")
+    if choix == "6":
+        system("clear")
+        quit()
+def level_choose(lvl):
+    system("clear")          
+    print("----Choose your level----")  
+    print("    ")          
+    print("    ")          
+    print("1.Level 1")       
+    print("2.Level 2")       
+    print("3.Level 3")       
+    print("4.Level 4")       
+    print("5.Level 5")       
+    print("6.Level 6")       
+    print("7.Level 7")       
+    print("8.Level 8")       
+    print("9.Level 9")       
+    print("10.Level 10")       
+    print("     ")         
+    print("      ")        
+    choix = input("Choose your level: ")
+    x = random_map(int(choix),int(choix))
+    system("clear")
+    wrapper(main,x,lvl)
+    
+#path = sys.argv[1]
 system("clear")
-wrapper(main)
+menu()
+#print(x)
+#wrapper(main,path)
 
