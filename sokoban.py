@@ -10,6 +10,7 @@ import curses
 from curses import wrapper
 from random import randint  
 import os
+import sys
 from os import system
 
 def random_str(n1,n2):
@@ -96,6 +97,21 @@ def print_corner(w,lenght):
         if w[i] == "#" and w[i + 1] == "#" and w[i + lenght] == "#" and w[i + lenght + 1] == "W":
             return (1)
 
+def you_loose(stdscr):
+    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_WHITE)
+    curses.init_pair(2, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    stdscr.clear()
+    stdscr.refresh()
+    stdscr.addstr(10,90,"You lost",curses.color_pair(1))
+    stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
+    stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
+    system("clear")
+    c = stdscr.getch()
+    if c == ord('q'):
+        quit()
+    if c == ord('r'):
+        wrapper(main)
+    
 def main(stdscr):
     system("clear")
     stdscr.clear()
@@ -136,8 +152,21 @@ def main(stdscr):
         #    quit()
         for i in range(w_nbr):
             if w[posw[i] - lenght] == "#" and w[posw[i] - lenght + 1] == "#" and w[posw[i] - 1] == "#" and w[posw[i]] == "W":
-                quit()
-        
+                win = 2
+                you_loose(stdscr)
+            if w[posw[i] - lenght] == "W" and w[posw[i] - lenght + 1] == "W" and w[posw[i] - 1] == "W" and w[posw[i]] == "W":
+                win = 2
+                you_loose(stdscr)
+            if w[posw[i] - lenght] == "#" and w[posw[i] - lenght - 1] == "#" and w[posw[i] + 1] == "#" and w[posw[i]] == "W":
+                win = 2
+                you_loose(stdscr)
+            if w[posw[i] + lenght] == "#" and w[posw[i] + lenght - 1] == "#" and w[posw[i] - 1] == "#" and w[posw[i]] == "W":
+                win = 2
+                you_loose(stdscr)
+            if w[posw[i] + lenght] == "#" and w[posw[i] + lenght + 1] == "#" and w[posw[i] + 1] == "#" and w[posw[i]] == "W":
+                win = 2
+                you_loose(stdscr)
+                
         if count_box(w,"O") == 0 and pos not in hole_pos:
             #print("ok")
             win = 1
@@ -216,6 +245,7 @@ def main(stdscr):
                 w[pos] = "O"    
     stdscr.refresh()
 
+board = sys.argv[1]
 system("clear")
 wrapper(main)
 
