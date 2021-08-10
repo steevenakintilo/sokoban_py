@@ -105,32 +105,58 @@ def you_loose(stdscr,path,lvl):
     stdscr.addstr(10,90,"You lost",curses.color_pair(1))
     stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
     stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
+    stdscr.addstr(16,90,"Press M to go to the menu!",curses.color_pair(1))
     system("clear")
     c = stdscr.getch()
     if c == ord('r'):
         wrapper(main,path,lvl)
+    if c == ord('m'):
+        curses.endwin()
+        menu()
     else:
         quit()
 def you_win(stdscr,tries,path,lvl):
     curses.init_pair(1, curses.COLOR_GREEN, curses.COLOR_WHITE)
     stdscr.clear()
     stdscr.refresh()
-    stdscr.addstr(10,90,"You Win! in " + str(tries) + " tries",curses.color_pair(1))
-    stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
-    stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
-    if lvl != 100:
+    if lvl != 1 and lvl <= 10:
         stdscr.addstr(16,90,"Press C to continue to the next level!",curses.color_pair(1))
-    system("clear")
-    x = random_map(lvl,lvl)
-    c = stdscr.getch()
-    if c == ord('r'):
-        lvl = lvl - 1
+    if lvl != 11:
+        stdscr.addstr(10,90,"You Win! in " + str(tries) + " tries",curses.color_pair(1))
+        stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
+        stdscr.addstr(14,90,"Press R to restart!",curses.color_pair(1))
+        stdscr.addstr(18,90,"Press M to go to the menu!",curses.color_pair(1))
+        system("clear")
         x = random_map(lvl,lvl)
-        wrapper(main,x,lvl)
-    if c == ord('c'):
-        wrapper(main,x,lvl)
-    else:
-        quit()
+        c = stdscr.getch()
+        if c == ord('r'):
+            lvl = lvl - 1
+            x = random_map(lvl,lvl)
+            wrapper(main,x,lvl)
+        if c == ord('c'):
+            wrapper(main,x,lvl)
+        if c == ord('m'):
+            curses.endwin()
+            menu()
+        else:
+            quit()
+    if lvl == 11:
+        stdscr.addstr(10,90,"You finished all the level well done 🏆", curses.color_pair(1))
+        stdscr.addstr(12,90,"Press Q to quit!",curses.color_pair(1))
+        stdscr.addstr(14,90,"Press R to restart to level 1!",curses.color_pair(1))
+        stdscr.addstr(18,90,"Press M to go to the menu!",curses.color_pair(1))
+        system("clear")
+        c = stdscr.getch()
+        if c == ord('r'):
+            lvl = 1
+            x = random_map(1,1)
+            wrapper(main,x,lvl)
+        if c == ord('m'):
+            curses.endwin()
+            menu()
+        else:
+            quit()
+        
 def main(stdscr,path,lvl):
     system("clear")
     stdscr.clear()
@@ -199,68 +225,78 @@ def main(stdscr,path,lvl):
         if c == ord(' '):
             wrapper(main(stdscr,path,lvl))
         if c == curses.KEY_UP:
-            tries = tries + 1
             if w[pos] == "X" and w[pos - lenght] == " " :
                 w[pos - lenght] = "X"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos - lenght] == "W" and w[pos - lenght - lenght] != "#" and w[pos - lenght - lenght] != "W":
                 w[pos - lenght] = "X"
                 w[pos - lenght - lenght] = "W"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos - lenght] == "O" and w[pos - lenght - lenght] != "#":
                 w[pos - lenght] = "X"
                 w[pos] = " "
-            if pos in hole_pos:
+                tries = tries + 1
+            if pos in hole_pos and w[pos - lenght] != "#" and w[pos - lenght] != "W":
                 w[pos - lenght] = "X"
                 w[pos] = "O"
-            
-                
+                tries = tries + 1       
         if c == curses.KEY_DOWN:
-            tries = tries + 1
             if w[pos] == "X" and w[pos + lenght] == " ":
                 w[pos + lenght] = "X"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos + lenght] == "W" and w[pos + lenght + lenght] != "#" and w[pos + lenght + lenght] != "W":
                 w[pos + lenght] = "X"
                 w[pos + lenght + lenght] = "W"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos + lenght] == "O" and w[pos + lenght + lenght] != "#":
                 w[pos + lenght] = "X"
                 w[pos] = " "
-            if pos in hole_pos:
+                tries = tries + 1
+            if pos in hole_pos and w[pos + lenght] != "#" and w[pos + lenght] != "W":
                 w[pos + lenght] = "X"
                 w[pos] = "O"
+                tries = tries + 1
            
         if c == curses.KEY_LEFT:
-            tries = tries + 1
             if w[pos] == "X" and w[pos - 1] == " ":
                 w[pos - 1] = "X"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos - 1] == "W" and w[pos -2] != "#" and w[pos - 2] != "W":
                 w[pos - 1] = "X"
                 w[pos - 2] = "W"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos - 1] == "O" and w[pos - 2] != "#":
                 w[pos - 1] = "X"
                 w[pos] = " "
-            if pos in hole_pos:
+                tries = tries + 1
+            if pos in hole_pos and w[pos - 1] != "#" and w[pos - 1] != "W":
                 w[pos - 1] = "X"
                 w[pos] = "O"
+                tries = tries + 1
         if c == curses.KEY_RIGHT:
-            tries = tries + 1
             if w[pos] == "X" and w[pos + 1] == " ":
                 w[pos + 1] = "X"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos + 1] == "W" and w[pos + 2] != "#" and w[pos + 2] != "W":
                 w[pos + 1] = "X"
                 w[pos + 2] = "W"
                 w[pos] = " "
+                tries = tries + 1
             if w[pos] == "X" and w[pos + 1] == "O" and w[pos + 2] != "#":
                 w[pos + 1] = "X"
                 w[pos] = " "
-            if pos in hole_pos:
+                tries = tries + 1
+            if pos in hole_pos and w[pos + 1] != "#" and w[pos + 1] != "W":
                 w[pos + 1] = "X"
-                w[pos] = "O"    
+                w[pos] = "O"
+                tries = tries + 1    
     stdscr.refresh()
 
 def random_map(min,max):
@@ -299,7 +335,7 @@ def menu():
     x = random_map(1,10)
     map_nbr = print_file("map.nbr")
     path = print_file("map/level1")
-    system("clear")          
+    system("clear")         
     print("----SOKOBAN----")  
     print("    ")          
     print("    ")          
@@ -353,10 +389,6 @@ def level_choose(lvl):
     map_nbr = print_file("map.nbr")
     system("clear")
     wrapper(main,x,int(map_nbr))
-    
-system("clear")
-my_map = "your_map"
-menu()
-#print(x)
-#wrapper(main,path)
 
+system("clear")
+menu()
